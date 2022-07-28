@@ -26,9 +26,8 @@ public class SearchService {
         searchCache = new SearchCache();
     }
 
-    public SearchResult findTestersByCountryAndDevice(Command command) {
+    public SearchResult findTestersByCriteria(Command command) {
 
-        List<Tester> finalResult = new ArrayList<>();
 
         // If we have already seen this command before, just return the cached result
         SearchResult cachedResult = searchCache.containsAndGet(command);
@@ -37,55 +36,69 @@ public class SearchService {
         }
 
         // Since commands take in a string device description, get the list of deviceIds for those devices
-        List<Long> deviceIdSearch = new ArrayList<>();
+        // for ease of lookup
+        List<Long> deviceIdsToSearch = new ArrayList<>();
         for(String device : command.getDeviceCriteria()) {
-            deviceIdSearch.add(mDao.getMDeviceMap().get(device));
+            deviceIdsToSearch.add(mDao.getMDeviceMap().get(device));
         }
-        // Get testers by country and device
-        List<Tester> result = mDao.getMTesters()
-                .stream()
-                .filter(tester -> command.isCountryIsAll() ? true : command.getCountryCriteria().stream().anyMatch(item -> item.equals(tester.getCountry())))
-                .filter(tester -> command.isDeviceIsAll() ? true : deviceIdSearch.stream().anyMatch(item -> tester.getDevices().contains(item)))
-                .collect(Collectors.toList());
+
+        // Perform a search based on the country and device criteria
+        List<Tester> countryDeviceFilteredResults = getTestersByCountryandDevice(deviceIdsToSearch, command);
 
         Map<Tester, Long> bugsForTesterByDevices = new HashMap<>();
         List<Integer> testerBugDataInOrder = new ArrayList<>();
 
-        for(Tester t : result) {
-            bugsForTesterByDevices.put(t, getBugsForTesterByDevice(t, deviceIdSearch, command));
+        // Populate a map of tester id to number of bugs to use when sorting
+        for(Tester t : countryDeviceFilteredResults) {
+            bugsForTesterByDevices.put(t, getBugsForTesterByDevice(t, deviceIdsToSearch, command));
         }
 
-        for(Map.Entry<Tester, Long> testers : bugsForTesterByDevices.entrySet()) {
-            //System.out.println("Tester: " +testers.getKey() + "Num Bugs: " + testers.getValue());
-            testerBugDataInOrder.add(Math.toIntExact(testers.getValue()));
-            //@TODO fix this, this is not what we want to do
-            //sort in descending order
-            Collections.sort(testerBugDataInOrder, Collections.reverseOrder());
-        }
-
-        finalResult = mDao.getMTesters()
-                .stream()
-                .filter(tester -> command.isCountryIsAll() ? true : command.getCountryCriteria().stream().anyMatch(item -> item.equals(tester.getCountry())))
-                .filter(tester -> command.isDeviceIsAll() ? true : deviceIdSearch.stream().anyMatch(item -> tester.getDevices().contains(item)))
-                .sorted(new Comparator<Tester>() {
-                    @Override
-                    public int compare(Tester o1, Tester o2) {
-                        if(bugsForTesterByDevices.get(o1) > bugsForTesterByDevices.get(o2)){
-                            return -1;
-                        } else if (bugsForTesterByDevices.get(o1) < bugsForTesterByDevices.get(o2)) {
-                            return 1;
-                        }
-                        return 0;
+        // This sorting could be done in the initial search but populating a map and comparing
+        // using the map constant lookup is quicker than calling the bugLookup in the comparator everytime
+        List<Tester> resultsOrderedByExperience = countryDeviceFilteredResults.stream().sorted((o1, o2) -> {
+                    if(bugsForTesterByDevices.get(o1) > bugsForTesterByDevices.get(o2)){
+                        return -1;
+                    } else if (bugsForTesterByDevices.get(o1) < bugsForTesterByDevices.get(o2)) {
+                        return 1;
                     }
+                    return 0;
                 })
                 .collect(Collectors.toList());
 
-        SearchResult res = new SearchResult(finalResult, testerBugDataInOrder);
+        // Create a list of testerBugData in order to attach to the SearchResult
+        for(Tester t : resultsOrderedByExperience) {
+            testerBugDataInOrder.add(Math.toIntExact(bugsForTesterByDevices.get(t)));
+        }
+
+        // Create the search result, add it to the cache and return it
+        SearchResult res = new SearchResult(resultsOrderedByExperience, testerBugDataInOrder);
         searchCache.put(command, res);
 
         return res;
     }
 
+    /**
+     * Returns a list of testers filtered by command criteria
+     * @param deviceIdsToSearch
+     * @param command
+     * @return
+     */
+    private List<Tester> getTestersByCountryandDevice(List<Long> deviceIdsToSearch, Command command) {
+        // Perform a search based on the country and device criteria
+        return mDao.getMTesters()
+                .stream()
+                .filter(tester -> command.isCountryIsAll() ? true : command.getCountryCriteria().stream().anyMatch(item -> item.equals(tester.getCountry())))
+                .filter(tester -> command.isDeviceIsAll() ? true : deviceIdsToSearch.stream().anyMatch(item -> tester.getDevices().contains(item)))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the amount of bugs a tester has filed for a given set of devices
+     * @param t
+     * @param deviceIds
+     * @param command
+     * @return
+     */
     private Long getBugsForTesterByDevice(Tester t, List<Long> deviceIds, Command command) {
         return mDao.getMBugs()
                 .stream()

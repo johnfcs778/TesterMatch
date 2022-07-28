@@ -24,7 +24,7 @@ public class SearchResult {
             builder.append(testersInOrder.get(i).toString());
             builder.append(" has filed: ");
             builder.append(testerBugDataInOrder.get(i));
-            builder.append("bugs; \n");
+            builder.append("bugs for the given device(s) \n");
         }
 
         return builder.toString();

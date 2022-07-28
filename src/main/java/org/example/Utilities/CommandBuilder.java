@@ -17,9 +17,15 @@ public class CommandBuilder {
      */
     public static Command buildCommand(String inputLine) {
         // This method is a little fragile
+
+        // Split the criteria into countries and devices
         String[] userCommand = inputLine.split("-");
-        String[] countries = userCommand[0].split("or");
-        String[] devices = userCommand[1].split("or");
+
+        // Split each set of countries and devices into single items
+        String[] countries = userCommand[0].split(" or ");
+        String[] devices = userCommand[1].split(" or ");
+
+        // Trim any extra whitespace if any exists
         for(int i = 0; i<countries.length; i++) {
             countries[i] = countries[i].trim();
         }
@@ -27,8 +33,11 @@ public class CommandBuilder {
         for(int i = 0; i<devices.length; i++) {
             devices[i] = devices[i].trim();
         }
+
+        // If the user has entered ALL for country or devices, set that in the command
         boolean countryAll = Arrays.asList(countries).contains("ALL");
         boolean devicesAll = Arrays.asList(devices).contains("ALL");
+
         return new Command(List.of(countries), List.of(devices), countryAll, devicesAll);
     }
 }

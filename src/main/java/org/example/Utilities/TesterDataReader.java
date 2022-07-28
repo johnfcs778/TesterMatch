@@ -153,13 +153,15 @@ public class TesterDataReader implements IDataReader{
 
         futureList.add(populateTesterDeviceMap);
 
+        // Wait for all the asynchronous computation to complete and get all the results
         return CompletableFuture.allOf(testersRead, devicesRead, bugsRead, populateDeviceMap, populateTesterDeviceMap)
-                .thenApplyAsync(dummy -> {
+                .thenApplyAsync(d -> {
                     List<Tester> testers = testersRead.join();
                     List<Device> devices = devicesRead.join();
                     List<Bug> bugs = bugsRead.join();
                     Map<String, Long> deviceMap = populateDeviceMap.join();
                     Map<Long, Set<Long>> tdMap = populateTesterDeviceMap.join();
+                    // Once data is read in, populate the device set on each tester
                     for(Map.Entry<Long, Set<Long>> en : tdMap.entrySet()) {
                         Optional<Tester> find = testers.stream().filter(tester -> tester.getTesterId().equals(en.getKey())).findFirst();
                         if(find.isPresent()){
