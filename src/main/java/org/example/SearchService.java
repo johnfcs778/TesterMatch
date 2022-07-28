@@ -3,6 +3,7 @@ package org.example;
 import org.example.DataAccess.Dao;
 import org.example.DataAccess.SearchCache;
 import org.example.Models.Command;
+import org.example.Models.SearchResult;
 import org.example.Models.Tester;
 
 import java.util.*;
@@ -25,12 +26,12 @@ public class SearchService {
         searchCache = new SearchCache();
     }
 
-    public List<Tester> findTestersByCountryAndDevice(Command command) {
+    public SearchResult findTestersByCountryAndDevice(Command command) {
 
         List<Tester> finalResult = new ArrayList<>();
 
         // If we have already seen this command before, just return the cached result
-        List<Tester> cachedResult = searchCache.containsAndGet(command);
+        SearchResult cachedResult = searchCache.containsAndGet(command);
         if(cachedResult != null) {
             return cachedResult;
         }
@@ -48,13 +49,18 @@ public class SearchService {
                 .collect(Collectors.toList());
 
         Map<Tester, Long> bugsForTesterByDevices = new HashMap<>();
+        List<Integer> testerBugDataInOrder = new ArrayList<>();
 
         for(Tester t : result) {
-            bugsForTesterByDevices.put(t, getBugsForTesterByDevice(t, deviceIdSearch));
+            bugsForTesterByDevices.put(t, getBugsForTesterByDevice(t, deviceIdSearch, command));
         }
 
         for(Map.Entry<Tester, Long> testers : bugsForTesterByDevices.entrySet()) {
-            System.out.println("Tester: " +testers.getKey() + "Num Bugs: " + testers.getValue());
+            //System.out.println("Tester: " +testers.getKey() + "Num Bugs: " + testers.getValue());
+            testerBugDataInOrder.add(Math.toIntExact(testers.getValue()));
+            //@TODO fix this, this is not what we want to do
+            //sort in descending order
+            Collections.sort(testerBugDataInOrder, Collections.reverseOrder());
         }
 
         finalResult = mDao.getMTesters()
@@ -74,15 +80,16 @@ public class SearchService {
                 })
                 .collect(Collectors.toList());
 
-        searchCache.put(command, finalResult);
+        SearchResult res = new SearchResult(finalResult, testerBugDataInOrder);
+        searchCache.put(command, res);
 
-        return finalResult;
+        return res;
     }
 
-    private Long getBugsForTesterByDevice(Tester t, List<Long> deviceIds) {
+    private Long getBugsForTesterByDevice(Tester t, List<Long> deviceIds, Command command) {
         return mDao.getMBugs()
                 .stream()
-                .filter(bug -> deviceIds.stream().anyMatch(item -> bug.getDeviceId().equals(item)))
+                .filter(bug -> command.isDeviceIsAll() ? true : deviceIds.stream().anyMatch(item -> bug.getDeviceId().equals(item)))
                 .filter(bug -> bug.getTesterId().equals(t.getTesterId()))
                 .count();
     }

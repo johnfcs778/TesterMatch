@@ -2,10 +2,8 @@ package org.example;
 
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
-import org.example.Models.Bug;
-import org.example.Models.Command;
-import org.example.Models.Device;
-import org.example.Models.Tester;
+import org.example.Models.*;
+import org.example.Utilities.CommandBuilder;
 import org.example.Utilities.IDataReader;
 import org.example.Utilities.TesterDataReader;
 
@@ -31,35 +29,17 @@ public class Main {
         System.out.println("DeviceCritera examples: {iPhone 4} {iPhone5 or iPhone 5} {ALL}  (omit brackets)");
         // Main Program Loop
         while(!userQuit) {
-            String[] userCommand = inputReader.readLine().split("-");
-            //@TODO extract this command object creation to function or class
-            String[] countries = userCommand[0].split("or");
-            String[] devices = userCommand[1].split("or");
-            for(int i = 0; i<countries.length; i++) {
-                countries[i] = countries[i].trim();
-            }
-
-            for(int i = 0; i<devices.length; i++) {
-                devices[i] = devices[i].trim();
-            }
-            Command cmd = new Command(List.of(countries), List.of(devices), false, false);
-            List<Tester> testersByCountry = searchService.findTestersByCountryAndDevice(cmd);
-            for(Tester t : testersByCountry) {
-                System.out.println(t.toString());
-            }
+            Command cmd = CommandBuilder.buildCommand( inputReader.readLine());
+            System.out.println(searchService.findTestersByCountryAndDevice(cmd));
 
         }
-        Command cmd = new Command(List.of("US"), List.of("iPhone 4"), true, false);
-        List<Tester> testersByCountry = searchService.findTestersByCountryAndDevice(cmd);
-        for(Tester t : testersByCountry) {
-            System.out.println(t.toString());
-        }
-
-        cmd = new Command(List.of("US"), List.of("iPhone 4"), true, false);
-        List<Tester> testersByCountry2 = searchService.findTestersByCountryAndDevice(cmd);
-        for(Tester t : testersByCountry2) {
-            System.out.println(t.toString());
-        }
+//        Command cmd = new Command(List.of("US"), List.of("iPhone 4"), false, true);
+//        SearchResult testersByCountry = searchService.findTestersByCountryAndDevice(cmd);
+//        System.out.println(testersByCountry);
+//
+//        cmd = new Command(List.of("US"), List.of("iPhone 4"), true, false);
+//        SearchResult testersByCountry2 = searchService.findTestersByCountryAndDevice(cmd);
+//        System.out.println(testersByCountry);
     }
 
 

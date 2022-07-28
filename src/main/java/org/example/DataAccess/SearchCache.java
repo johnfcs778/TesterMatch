@@ -2,6 +2,7 @@ package org.example.DataAccess;
 
 
 import org.example.Models.Command;
+import org.example.Models.SearchResult;
 import org.example.Models.Tester;
 
 import java.util.HashMap;
@@ -12,7 +13,7 @@ import java.util.List;
  * lookup of results for duplicated commands
  */
 public class SearchCache {
-    private HashMap<Command, List<Tester>> mCache;
+    private HashMap<Command, SearchResult> mCache;
 
     public SearchCache() {
         mCache = new HashMap<>();
@@ -26,7 +27,7 @@ public class SearchCache {
      * @param cmd
      * @return
      */
-    public List<Tester> containsAndGet(Command cmd) {
+    public SearchResult containsAndGet(Command cmd) {
         for(Command key : mCache.keySet()){
             if(key.equals(cmd)) {
                 return mCache.get(key);
@@ -38,9 +39,9 @@ public class SearchCache {
     /**
      * Adds a new command to result mapping in the cache
      * @param cmd
-     * @param testers
+     * @param searchResult
      */
-    public void put(Command cmd, List<Tester> testers) {
-        mCache.put(cmd, testers);
+    public void put(Command cmd, SearchResult searchResult) {
+        mCache.put(cmd, searchResult);
     }
 }
