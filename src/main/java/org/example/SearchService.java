@@ -3,10 +3,7 @@ package org.example;
 import org.example.Models.Command;
 import org.example.Models.Tester;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SearchService {
@@ -22,32 +19,43 @@ public class SearchService {
         for(String device : command.getDeviceCriteria()) {
             deviceIdSearch.add(mDao.getMDeviceMap().get(device));
         }
-//        // Get testers by country and device
-//        List<Tester> result = mDao.getMTesters()
-//                .stream()
-//                .filter(tester -> tester.getCountry().equals(country))
-//                .filter(tester -> tester.getDevices().contains(deviceIdSearch))
-//                .collect(Collectors.toList());
-//
-//        Map<Tester, Long> bugsForTesterByDevices = new HashMap<>();
-//
-//        for(Tester t : result) {
-//            Long numBugsForTesterDevice = mDao.getMBugs()
-//                    .stream()
-//                    .filter(bug -> bug.getDeviceId().equals(deviceIdSearch))
-//                    .filter(bug -> bug.getTesterId().equals(t.getTesterId()))
-//                    .count();
-//            bugsForTesterByDevices.put(t, numBugsForTesterDevice);
-//        }
-//
-//        for(Map.Entry<Tester, Long> testers : bugsForTesterByDevices.entrySet()) {
-//            System.out.println("Tester: " +testers.getKey() + "Num Bugs: " + testers.getValue());
-//        }
+        // Get testers by country and device
+        List<Tester> result = mDao.getMTesters()
+                .stream()
+                .filter(tester -> command.isCountryIsAll() ? true : command.getCountryCriteria().stream().anyMatch(item -> item.equals(tester.getCountry())))
+                .filter(tester -> command.isDeviceIsAll() ? true : deviceIdSearch.stream().anyMatch(item -> tester.getDevices().contains(item)))
+                .collect(Collectors.toList());
+
+        Map<Tester, Long> bugsForTesterByDevices = new HashMap<>();
+
+        for(Tester t : result) {
+            Long numBugsForTesterDevice = mDao.getMBugs()
+                    .stream()
+                    .filter(bug -> deviceIdSearch.stream().anyMatch(item -> bug.getDeviceId().equals(item)))
+                    .filter(bug -> bug.getTesterId().equals(t.getTesterId()))
+                    .count();
+            bugsForTesterByDevices.put(t, numBugsForTesterDevice);
+        }
+
+        for(Map.Entry<Tester, Long> testers : bugsForTesterByDevices.entrySet()) {
+            System.out.println("Tester: " +testers.getKey() + "Num Bugs: " + testers.getValue());
+        }
 
         return mDao.getMTesters()
                 .stream()
                 .filter(tester -> command.isCountryIsAll() ? true : command.getCountryCriteria().stream().anyMatch(item -> item.equals(tester.getCountry())))
                 .filter(tester -> command.isDeviceIsAll() ? true : deviceIdSearch.stream().anyMatch(item -> tester.getDevices().contains(item)))
+                .sorted(new Comparator<Tester>() {
+                    @Override
+                    public int compare(Tester o1, Tester o2) {
+                        if(bugsForTesterByDevices.get(o1) > bugsForTesterByDevices.get(o2)){
+                            return -1;
+                        } else if (bugsForTesterByDevices.get(o1) < bugsForTesterByDevices.get(o2)) {
+                            return 1;
+                        }
+                        return 0;
+                    }
+                })
                 .collect(Collectors.toList());
     }
 }
