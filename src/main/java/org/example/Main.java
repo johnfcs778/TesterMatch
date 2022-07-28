@@ -3,6 +3,7 @@ package org.example;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
 import org.example.Models.Bug;
+import org.example.Models.Command;
 import org.example.Models.Device;
 import org.example.Models.Tester;
 import org.example.Utilities.IDataReader;
@@ -19,7 +20,8 @@ public class Main {
         IDataReader reader = new TesterDataReader();
 
         SearchService searchService = new SearchService( reader.readData("src/main/java/org/example/Data"));
-        List<Tester> testersByCountry = searchService.findTestersByCountryAndDevice("US", "iPhone 4");
+        Command cmd = new Command(List.of("US"), List.of("iPhone 4"), true, false);
+        List<Tester> testersByCountry = searchService.findTestersByCountryAndDevice(cmd);
         for(Tester t : testersByCountry) {
             System.out.println(t.toString());
         }
