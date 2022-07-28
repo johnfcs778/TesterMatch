@@ -18,7 +18,10 @@ public class Main {
         boolean userQuit = false;
 
         IDataReader reader = new TesterDataReader();
+        long start1 = System.currentTimeMillis();
         SearchService searchService = new SearchService( reader.readData("src/main/java/org/example/Data"));
+        long end1 = System.currentTimeMillis();
+        System.out.println("Elapsed Time in milli seconds: "+ (end1-start1));
 
         BufferedReader inputReader = new BufferedReader(
                 new InputStreamReader(System.in));
@@ -26,11 +29,14 @@ public class Main {
         System.out.println("Please enter commmands followed by a keyboard enter");
         System.out.println("Please enter commands in the format of CountryCriteria-DeviceCriteria(separated by a single dash)");
         System.out.println("CountryCriteria examples: {US} {US or JP} {ALL}  (Omit brackets)");
-        System.out.println("DeviceCritera examples: {iPhone 4} {iPhone5 or iPhone 5} {ALL}  (omit brackets)");
+        System.out.println("DeviceCritera examples: {iPhone 4} {iPhone5 or iPhone 5} {ALL}  (Omit brackets)");
         // Main Program Loop
         while(!userQuit) {
             Command cmd = CommandBuilder.buildCommand( inputReader.readLine());
+            long start2 = System.currentTimeMillis();
             System.out.println(searchService.findTestersByCountryAndDevice(cmd));
+            long end2 = System.currentTimeMillis();
+            System.out.println("Elapsed Time in milli seconds: "+ (end2-start2));
 
         }
 //        Command cmd = new Command(List.of("US"), List.of("iPhone 4"), false, true);
