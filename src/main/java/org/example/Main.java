@@ -25,6 +25,12 @@ public class Main {
         for(Tester t : testersByCountry) {
             System.out.println(t.toString());
         }
+
+        cmd = new Command(List.of("US"), List.of("iPhone 4"), true, false);
+        List<Tester> testersByCountry2 = searchService.findTestersByCountryAndDevice(cmd);
+        for(Tester t : testersByCountry2) {
+            System.out.println(t.toString());
+        }
     }
 
 

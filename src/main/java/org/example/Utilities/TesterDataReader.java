@@ -3,7 +3,7 @@ package org.example.Utilities;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.exceptions.CsvValidationException;
-import org.example.Dao;
+import org.example.DataAccess.Dao;
 import org.example.Models.Bug;
 import org.example.Models.Device;
 import org.example.Models.Tester;
