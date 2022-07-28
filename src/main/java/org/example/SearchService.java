@@ -8,8 +8,16 @@ import org.example.Models.Tester;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * A service supporting data lookup of testers by search criteria specified by
+ * passed in command objects
+ */
 public class SearchService {
+
+    // Data access object to store the in-memory data for the system
     private Dao mDao;
+
+    // Cache to immediately return results for duplicated commands
     private SearchCache searchCache;
 
     public SearchService(Dao dao) {

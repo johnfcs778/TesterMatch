@@ -7,6 +7,10 @@ import org.example.Models.Tester;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Cache object wrapper for a map of commands to Tester results for quick
+ * lookup of results for duplicated commands
+ */
 public class SearchCache {
     private HashMap<Command, List<Tester>> mCache;
 
@@ -31,6 +35,11 @@ public class SearchCache {
         return null;
     }
 
+    /**
+     * Adds a new command to result mapping in the cache
+     * @param cmd
+     * @param testers
+     */
     public void put(Command cmd, List<Tester> testers) {
         mCache.put(cmd, testers);
     }

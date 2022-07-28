@@ -6,6 +6,9 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+/**
+ * Data model representing a tester
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

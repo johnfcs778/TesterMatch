@@ -14,6 +14,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Data reader class to read in csv files into bean objects which will return
+ * a populated data access object containing data to be searched
+ */
 public class TesterDataReader implements IDataReader{
     @Override
     public Dao readData(String dataFolderPath) throws IOException, CsvValidationException {

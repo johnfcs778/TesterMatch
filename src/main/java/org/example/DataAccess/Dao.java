@@ -12,16 +12,24 @@ import java.util.Map;
 import java.util.Set;
 
 
+/**
+ * Data access object for in-memory data store. Stores data and lookup objects
+ * for testers, devices, and bugs
+ */
 @NoArgsConstructor
 @Getter
 @Setter
 public class Dao {
     private List<Tester> mTesters;
+
     private List<Device> mDevices;
+
     private List<Bug> mBugs;
 
+    // Maps Device string identifiers to deviceIds
     private Map<String, Long> mDeviceMap;
 
+    // Maps testerIds to the set of deviceIds the tester has filed a bug for
     private Map<Long, Set<Long>> mTesterDeviceMap;
 
     public Dao(List<Tester> testers, List<Device> devices, List<Bug> bugs, Map<String, Long> deviceMap, Map<Long, Set<Long>> testerDeviceMap ) {
@@ -32,15 +40,4 @@ public class Dao {
         this.mTesterDeviceMap = testerDeviceMap;
     }
 
-    public void addTester(Tester tester) {
-        mTesters.add(tester);
-    }
-
-    public void addDevice(Device device) {
-        mDevices.add(device);
-    }
-
-    public void addBug(Bug bug) {
-        mBugs.add(bug);
-    }
 }

@@ -6,6 +6,9 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * Command object representing a user entered command
+ */
 @AllArgsConstructor
 @Setter
 @Getter
