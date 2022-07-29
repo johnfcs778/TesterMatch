@@ -51,3 +51,8 @@ Users can search Testers by providing criteria containing the tester's country a
     Tester(testerId=3, firstName=Leonard, lastName=Sutton, country=GB, lastLogin=2013-07-16 21:17:28, devices=[3, 4, 5, 6]) has filed: 106bugs for the given device(s) 
     Tester(testerId=9, firstName=Darshini, lastName=Thiagarajan, country=GB, lastLogin=2013-08-05 15:00:38, devices=[5, 6, 8, 9]) has filed: 104bugs for the given device(s) 
     Tester(testerId=2, firstName=Michael, lastName=Lubavin, country=US, lastLogin=2013-07-12 13:27:18, devices=[4, 5, 6, 7, 8, 9]) has filed: 99bugs for the given device(s)
+
+
+## How To Run
+The project is a Java Maven project and can be run with IntelliJ or another IDE supporting maven
+The code can be checked out with: git clone https://github.com/johnfcs778/TesterMatch.git
