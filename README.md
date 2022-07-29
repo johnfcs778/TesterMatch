@@ -55,4 +55,6 @@ Users can search Testers by providing criteria containing the tester's country a
 
 ## How To Run
 The project is a Java Maven project and can be run with IntelliJ or another IDE supporting maven
-The code can be checked out with: git clone https://github.com/johnfcs778/TesterMatch.git
+The code can be checked out with: `git clone https://github.com/johnfcs778/TesterMatch.git`
+Otherwise, with the JAR file in the root directory, you can run: `$java -jar TesterMatch-1.0-SNAPSHOT-jar-with-dependencies.jar`
+
