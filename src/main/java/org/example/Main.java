@@ -23,10 +23,16 @@ public class Main {
         System.out.println("Please enter commands in the format of CountryCriteria-DeviceCriteria(separated by a single dash)");
         System.out.println("CountryCriteria examples: {US} {US or JP} {ALL}  (Omit brackets)");
         System.out.println("DeviceCritera examples: {iPhone 4} {iPhone4 or iPhone 5} {ALL}  (Omit brackets)");
+        System.out.println("Type QUIT to quit.");
         // Main Program Loop
         while(!userQuit) {
-            Command cmd = CommandBuilder.buildCommand( inputReader.readLine());
-            System.out.println(searchService.findTestersByCriteria(cmd));
+            String userInput = inputReader.readLine();
+            if(userInput.equals("QUIT")) {
+                userQuit = true;
+            } else {
+                Command cmd = CommandBuilder.buildCommand( userInput );
+                System.out.println(searchService.findTestersByCriteria(cmd));
+            }
         }
 
     }
